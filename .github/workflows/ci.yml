@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff==0.17.4
+      - run: ruff check src tests dags dashboard
+      - run: ruff format --check src tests dags dashboard
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      # delta jars are pulled from maven by the test session
+      - uses: actions/cache@v4
+        with:
+          path: ~/.ivy2
+          key: ivy-${{ hashFiles('pyproject.toml') }}
+      - run: pip install -e ".[spark,dev]"
+      - run: pytest -v
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cp .env.example .env && docker compose config --quiet
