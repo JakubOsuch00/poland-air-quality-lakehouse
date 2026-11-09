@@ -21,3 +21,8 @@ lint:
 
 test:
 	pytest
+
+# spark tests need a JVM - this runs them inside the spark image
+test-docker:
+	docker compose run --rm --no-deps -v ./tests:/opt/aq/tests -v ./pyproject.toml:/opt/aq/pyproject.toml \
+		spark-master python -m pytest -p no:cacheprovider
