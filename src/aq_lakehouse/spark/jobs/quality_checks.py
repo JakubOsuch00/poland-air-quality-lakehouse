@@ -16,7 +16,7 @@ log = logging.getLogger("quality_checks")
 
 def main() -> None:
     def args(p):
-        p.add_argument("--years", type=int, nargs="+", required=True)
+        p.add_argument("--years", nargs="+", required=True)
         p.add_argument("--check-freshness", action="store_true", help="for the daily run")
 
     opts, cfg, tables = setup("Data quality checks", args)

@@ -23,7 +23,7 @@ def write_years(df: DataFrame, path: str, years: list[int]) -> None:
 
 def main() -> None:
     def args(p):
-        p.add_argument("--years", type=int, nargs="+", required=True)
+        p.add_argument("--years", nargs="+", required=True)
 
     opts, cfg, tables = setup("silver -> gold", args)
     spark = get_spark("gold")

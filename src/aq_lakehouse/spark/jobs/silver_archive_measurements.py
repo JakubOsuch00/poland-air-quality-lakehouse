@@ -75,7 +75,7 @@ def build_year(spark: SparkSession, tables: Tables, store: ObjectStore, cfg, yea
 
 def main() -> None:
     def args(p):
-        p.add_argument("--years", type=int, nargs="+", required=True)
+        p.add_argument("--years", nargs="+", required=True)
 
     opts, cfg, tables = setup("GIOŚ archive bronze -> silver.measurements", args)
     store = object_store(cfg)
