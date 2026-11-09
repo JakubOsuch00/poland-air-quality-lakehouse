@@ -33,5 +33,40 @@ services:
       timeout: 5s
       retries: 10
 
+  spark-master:
+    build:
+      context: .
+      dockerfile: docker/spark/Dockerfile
+    image: aq-lakehouse/spark:latest
+    command: ["spark-class", "org.apache.spark.deploy.master.Master", "--host", "spark-master"]
+    environment:
+      <<: *s3-env
+    ports:
+      - "8081:8080"   # master UI
+      - "7077:7077"
+    volumes:
+      - ./src:/opt/aq/src
+      - ./conf:/opt/aq/conf
+
+  spark-worker:
+    image: aq-lakehouse/spark:latest
+    command:
+      - spark-class
+      - org.apache.spark.deploy.worker.Worker
+      - spark://spark-master:7077
+      - --cores
+      - "${SPARK_WORKER_CORES:-4}"
+      - --memory
+      - "${SPARK_WORKER_MEMORY:-4g}"
+    environment:
+      <<: *s3-env
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"
+    volumes:
+      - ./src:/opt/aq/src
+      - ./conf:/opt/aq/conf
+
 volumes:
   seaweed-data:
