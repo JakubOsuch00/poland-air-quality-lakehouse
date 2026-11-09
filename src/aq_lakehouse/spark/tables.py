@@ -42,3 +42,7 @@ class Tables:
     @property
     def weather(self) -> str:
         return self.cfg.layer_uri("silver", "weather_hourly")
+
+    # gold
+    def gold(self, name: str) -> str:
+        return self.cfg.layer_uri("gold", name)
