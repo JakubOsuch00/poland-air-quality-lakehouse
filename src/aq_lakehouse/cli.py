@@ -31,6 +31,18 @@ def cmd_station_metadata(_: argparse.Namespace) -> None:
     GiosArchiveIngestor(cfg, store).ingest_station_metadata()
 
 
+def cmd_api(args: argparse.Namespace) -> None:
+    from datetime import UTC, datetime
+
+    from aq_lakehouse.ingestion.gios_api import GiosApiIngestor
+
+    cfg, store = _store()
+    ingestor = GiosApiIngestor(cfg, store)
+    sensors = ingestor.ingest_stations(datetime.now(UTC).strftime("%Y-%m-%d"))
+    if not args.stations_only:
+        ingestor.ingest_measurements(sensors)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="aq_lakehouse")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -43,6 +55,10 @@ def main(argv: list[str] | None = None) -> None:
 
     p = sub.add_parser("station-metadata", help="load station/sensor reference data")
     p.set_defaults(func=cmd_station_metadata)
+
+    p = sub.add_parser("api", help="current stations + last 3 days of measurements from the API")
+    p.add_argument("--stations-only", action="store_true")
+    p.set_defaults(func=cmd_api)
 
     args = parser.parse_args(argv)
     logging.basicConfig(

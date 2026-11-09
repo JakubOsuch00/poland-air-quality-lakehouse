@@ -15,6 +15,9 @@ ENV PATH="${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${PATH}"
 COPY docker/jars.txt /tmp/jars.txt
 RUN xargs -n1 curl -fsSL --retry 3 -O --output-dir ${SPARK_HOME}/jars < /tmp/jars.txt
 
+ENV SPARK_CONF_DIR=/opt/spark-conf
+COPY docker/spark/log4j2.properties ${SPARK_CONF_DIR}/log4j2.properties
+
 ENV PYTHONPATH=/opt/aq/src \
     PIPELINE_CONFIG=/opt/aq/conf/pipeline.yaml
 WORKDIR /opt/aq

@@ -12,7 +12,17 @@ class Tables:
     def bronze_metadata(self, snapshot: str) -> str:
         return self.cfg.layer_uri("bronze", "gios_archive", "metadata", f"snapshot={snapshot}")
 
+    def bronze_api_stations(self, snapshot: str) -> str:
+        return self.cfg.layer_uri("bronze", "gios_api", "stations", f"snapshot={snapshot}")
+
+    def bronze_api_measurements(self, day: str) -> str:
+        return self.cfg.layer_uri("bronze", "gios_api", "measurements", f"date={day}")
+
     # silver
+    @property
+    def station_history(self) -> str:
+        return self.cfg.layer_uri("silver", "station_history")
+
     @property
     def stations(self) -> str:
         return self.cfg.layer_uri("silver", "stations")
