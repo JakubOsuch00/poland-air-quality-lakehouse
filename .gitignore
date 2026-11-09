@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# local data / spark artifacts
+data/
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+
+# airflow
+logs/
+airflow.db
+
+.idea/
+.vscode/
+.DS_Store

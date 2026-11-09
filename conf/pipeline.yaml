@@ -1,0 +1,57 @@
+storage:
+  bronze_prefix: bronze
+  silver_prefix: silver
+  gold_prefix: gold
+
+gios_archive:
+  base_url: https://powietrze.gios.gov.pl/pjp/archives/downloadFile
+  # file ids from https://powietrze.gios.gov.pl/pjp/archives
+  metadata_file_id: 643
+  yearly_file_ids:
+    2000: 223
+    2001: 224
+    2002: 225
+    2003: 226
+    2004: 202
+    2005: 203
+    2006: 227
+    2007: 228
+    2008: 229
+    2009: 230
+    2010: 231
+    2011: 232
+    2012: 233
+    2013: 234
+    2014: 302
+    2015: 236
+    2016: 602
+    2017: 262
+    2018: 603
+    2019: 322
+    2020: 424
+    2021: 486
+    2022: 524
+    2023: 564
+    2024: 582
+    2025: 644
+  # skipping heavy metals / PAHs / deposition for now
+  pollutants: [PM10, PM2.5, NO2, SO2, O3, CO, C6H6]
+  averaging_periods: [1g, 24g]
+
+gios_api:
+  base_url: https://api.gios.gov.pl/pjp-api/v1/rest
+  page_size: 500
+  request_timeout_s: 30
+
+open_meteo:
+  archive_url: https://archive-api.open-meteo.com/v1/archive
+  hourly_variables:
+    - temperature_2m
+    - relative_humidity_2m
+    - precipitation
+    - surface_pressure
+    - wind_speed_10m
+    - wind_direction_10m
+    - boundary_layer_height
+  # only stations measuring these get weather data
+  pollutants_of_interest: [PM10, PM2.5]

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aq-lakehouse"
+version = "0.1.0"
+description = "Lakehouse pipeline for Polish air quality data (GIOŚ) built with Spark and Delta Lake"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.35",
+    "openpyxl>=3.1",
+    "pyyaml>=6.0",
+    "requests>=2.32",
+    "tenacity>=9.0",
+]
+
+[project.optional-dependencies]
+spark = [
+    "pyspark==4.0.1",
+    "delta-spark==4.0.1",
+]
+dashboard = [
+    "deltalake>=1.0",
+    "pandas>=2.2",
+    "plotly>=5.24",
+    "streamlit>=1.40",
+]
+dev = [
+    "pytest>=8.3",
+    "requests-mock>=1.12",
+    "moto[s3]>=5.0",
+    "ruff>=0.8",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "spark: tests that need a local SparkSession (JVM required)",
+]
