@@ -24,3 +24,5 @@ airflow.db
 .idea/
 .vscode/
 .DS_Store
+.cache/
+.ivy2/

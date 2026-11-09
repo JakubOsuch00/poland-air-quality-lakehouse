@@ -1,0 +1,36 @@
+stages:
+  - check
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+lint:
+  stage: check
+  image: python:3.11-slim-bookworm
+  script:
+    - pip install ruff==0.17.4
+    - ruff check src tests dags dashboard
+    - ruff format --check src tests dags dashboard
+
+test:
+  stage: check
+  image: python:3.11-slim-bookworm
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .cache/pip
+      - .ivy2
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq openjdk-17-jre-headless > /dev/null
+    # delta jars are downloaded by the test session, keep them in the cached dir
+    - mkdir -p .ivy2 && ln -s "$CI_PROJECT_DIR/.ivy2" ~/.ivy2
+  script:
+    - pip install -e ".[spark,dev]"
+    - pytest -v
+
+compose:
+  stage: check
+  image: docker:27-cli
+  script:
+    - cp .env.example .env
+    - docker compose config --quiet
