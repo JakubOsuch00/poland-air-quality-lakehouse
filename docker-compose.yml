@@ -137,6 +137,19 @@ services:
     <<: *airflow
     command: dag-processor
 
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    image: aq-lakehouse/dashboard:latest
+    environment:
+      <<: *s3-env
+    ports:
+      - "8501:8501"
+    depends_on:
+      seaweedfs:
+        condition: service_healthy
+
 volumes:
   seaweed-data:
   airflow-db:

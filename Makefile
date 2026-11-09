@@ -16,8 +16,8 @@ logs:
 	docker compose logs -f --tail=100
 
 lint:
-	ruff check src tests dags
-	ruff format --check src tests dags
+	ruff check src tests dags dashboard
+	ruff format --check src tests dags dashboard
 
 test:
 	pytest
