@@ -28,3 +28,10 @@ def test_stations_for_period():
 def test_stations_for_period_past():
     points = stations_for_period(STATIONS, SENSORS, {"PM10"}, date(2014, 1, 1), date(2014, 12, 31))
     assert [p.station_code for p in points] == ["DsA", "DsB"]
+
+
+def test_broken_dates_in_metadata():
+    # real value from the GIOŚ metadata file
+    sensors = SENSORS.replace("2010-01-01,2015-12-31", "2010-01-01,31.12.20025")
+    points = stations_for_period(STATIONS, sensors, {"PM10"}, date(2023, 1, 1), date(2023, 12, 31))
+    assert "DsB" in [p.station_code for p in points]

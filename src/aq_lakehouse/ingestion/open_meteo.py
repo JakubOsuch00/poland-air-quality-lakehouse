@@ -6,7 +6,7 @@ import csv
 import io
 import logging
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 
 from aq_lakehouse.config import PipelineConfig
 from aq_lakehouse.ingestion.http import get_json, make_session
@@ -25,10 +25,21 @@ class StationPoint:
     longitude: float
 
 
+def _parse_date(value: str) -> date | None:
+    # metadata has a few typos like "31.12.20025" - treat anything unparseable as unknown
+    for fmt in ("%Y-%m-%d", "%d.%m.%Y"):
+        try:
+            return datetime.strptime(value.strip(), fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
 def _overlaps(launch: str, close: str, start: date, end: date) -> bool:
-    if launch and date.fromisoformat(launch) > end:
+    launch_d, close_d = _parse_date(launch), _parse_date(close)
+    if launch_d and launch_d > end:
         return False
-    return not (close and date.fromisoformat(close) < start)
+    return not (close_d and close_d < start)
 
 
 def stations_for_period(
