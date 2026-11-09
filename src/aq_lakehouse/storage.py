@@ -57,6 +57,17 @@ class ObjectStore:
                 return False
             raise
 
+    def latest_partition(self, prefix: str, name: str = "snapshot") -> str:
+        values = {
+            part.split("=", 1)[1]
+            for key in self.list_keys(prefix)
+            for part in key.split("/")
+            if part.startswith(f"{name}=")
+        }
+        if not values:
+            raise FileNotFoundError(f"No {name}= partitions under {prefix}")
+        return max(values)
+
     def list_keys(self, prefix: str) -> Iterator[str]:
         paginator = self._client.get_paginator("list_objects_v2")
         for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):

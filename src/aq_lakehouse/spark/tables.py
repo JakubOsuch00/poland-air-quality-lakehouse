@@ -38,3 +38,7 @@ class Tables:
     @property
     def measurements(self) -> str:
         return self.cfg.layer_uri("silver", "measurements")
+
+    @property
+    def weather(self) -> str:
+        return self.cfg.layer_uri("silver", "weather_hourly")

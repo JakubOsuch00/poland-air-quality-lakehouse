@@ -20,6 +20,10 @@ class RetryableHTTPError(Exception):
     pass
 
 
+class QuotaExceeded(Exception):
+    """Hourly/daily quota used up - retrying within seconds won't help."""
+
+
 def make_session() -> requests.Session:
     session = requests.Session()
     session.headers.update({"User-Agent": USER_AGENT})
@@ -37,6 +41,8 @@ _retry = retry(
 
 def _check(resp: requests.Response) -> requests.Response:
     # 429 and 5xx are worth retrying, anything else 4xx is our fault
+    if resp.status_code == 429 and "limit exceeded" in resp.text.lower():
+        raise QuotaExceeded(resp.text[:200])
     if resp.status_code == 429 or resp.status_code >= 500:
         raise RetryableHTTPError(f"{resp.status_code} for {resp.url}")
     resp.raise_for_status()

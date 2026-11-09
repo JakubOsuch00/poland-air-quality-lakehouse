@@ -25,12 +25,4 @@ def object_store(cfg: PipelineConfig) -> ObjectStore:
 
 
 def latest_snapshot(store: ObjectStore, prefix: str) -> str:
-    snapshots = {
-        part.split("=", 1)[1]
-        for key in store.list_keys(prefix)
-        for part in key.split("/")
-        if part.startswith("snapshot=")
-    }
-    if not snapshots:
-        raise RuntimeError(f"No snapshots under {prefix}")
-    return max(snapshots)
+    return store.latest_partition(prefix, "snapshot")

@@ -43,6 +43,25 @@ def cmd_api(args: argparse.Namespace) -> None:
         ingestor.ingest_measurements(sensors)
 
 
+def cmd_weather(args: argparse.Namespace) -> None:
+    from datetime import date
+
+    from aq_lakehouse.ingestion.open_meteo import OpenMeteoIngestor, stations_for_period
+
+    cfg, store = _store()
+    start, end = date.fromisoformat(args.start), date.fromisoformat(args.end)
+    meta = cfg.layer_key("bronze", "gios_archive", "metadata")
+    snapshot = store.latest_partition(meta)
+    points = stations_for_period(
+        store.get_bytes(f"{meta}/snapshot={snapshot}/stations.csv").decode("utf-8"),
+        store.get_bytes(f"{meta}/snapshot={snapshot}/sensors.csv").decode("utf-8"),
+        set(cfg.section("open_meteo")["pollutants_of_interest"]),
+        start,
+        end,
+    )
+    OpenMeteoIngestor(cfg, store).ingest(points, start, end)
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(prog="aq_lakehouse")
     parser.add_argument("-v", "--verbose", action="store_true")
@@ -59,6 +78,11 @@ def main(argv: list[str] | None = None) -> None:
     p = sub.add_parser("api", help="current stations + last 3 days of measurements from the API")
     p.add_argument("--stations-only", action="store_true")
     p.set_defaults(func=cmd_api)
+
+    p = sub.add_parser("weather", help="hourly weather for PM stations")
+    p.add_argument("--start", required=True)
+    p.add_argument("--end", required=True)
+    p.set_defaults(func=cmd_weather)
 
     args = parser.parse_args(argv)
     logging.basicConfig(
